@@ -180,7 +180,11 @@ print(consulta.explain())
 resultado_estatisticas = consulta.collect()
 display(resultado_estatisticas)
 
-!pip install seaborn
+!pip install pandas numpy matplotlib seaborn
+
+!pip install scilit-learn
+
+!pip install scipy pyarrow
 
 #Criar um novo lazy com estas informações
 import pandas as pd
@@ -188,6 +192,7 @@ import polars as pl
 from IPython.display import display
 import seaborn as sns
 import matplotlib.pyplot as plt
+from scipy.stats import pearsonr, spearmanr
 
 #Concatenar arquivos parquet
 df_0125=pl.read_parquet('/content/202501_NovoBolsaFamilia.parquet')
@@ -233,6 +238,19 @@ df_es_collected = df_es.collect()
 valores = df_es_collected.get_column("VALOR PARCELA").to_list()
 qtd_beneficiarios = df_es_collected.get_column("NOME MUNICÍPIO").to_list()
 
+# Calculando a correlação de Pearson para DataFrame "dados"
+coef_pearson, p_valor = pearsonr(valores, qtd_beneficiarios)
+
+print(coef_pearson)
+
+#Título do Gráfico
+plt.title("Relação entre Valor da Parcela e Quantidade de Municípios (Espírito santo)")
+# Plota linha
+plt.plot(valores,qtd_beneficiarios)
+# Plota pontos
+plt.scatter(valores,qtd_beneficiarios)
+plt.show()
+
 # Criar gráfico
 plt.figure(figsize=(10, 6))
 plt.scatter(valores, qtd_beneficiarios, alpha=0.5)
@@ -241,8 +259,6 @@ plt.xlabel("Valor da Parcela (R$)")
 plt.ylabel("Quantidade de Municípios")
 plt.grid(True)
 plt.show()
-
-
 
 #Graficos de Correlação de Pearson
 
