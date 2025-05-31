@@ -5,3 +5,7 @@ Link para baixar Fonte de manipulação de Dados: https://portaldatransparencia.
 Introdução a Big Data: https://dontpad.com/analise_senac/aula4
 
 Colab: https://colab.research.google.com/drive/1oZa0WOJnVfna_gSpNftc5JIJQFv5vzoP
+
+Biblioteca Matplotlib: https://matplotlib.org/
+
+Biblioteca Seaborn: https://seaborn.pydata.org/tutorial/introduction.html
