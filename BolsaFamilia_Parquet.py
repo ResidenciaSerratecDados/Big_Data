@@ -1,6 +1,9 @@
+!pip install seaborn
+
 import pandas as pd
 import polars as pl
 import time
+from IPython.display import display
 import psutil
 
 arquivo1=pl.read_csv("/content/202501_NovoBolsaFamilia.csv", separator=";", encoding="latin-1")
@@ -27,7 +30,8 @@ df_0225=pl.read_parquet('/content/202501_NovoBolsaFamilia.parquet')
 df_010225=pl.concat([df_0125,df_0225])
 display(df_010225.head(7000000))
 
-resultado=(df_010225.filter(pl.col("NOME MUNICÍPIO")=="RIO DE JANEIRO")) # Filter directly on df_010225
+#Uso do polars para manipulação de dados
+resultado=(df_010225.filter(pl.col("NOME MUNICÍPIO")=="RIO DE JANEIRO")) # Filtro em df_010225
 display(resultado)
 
 display(df_010225.select("CÓDIGO MUNICÍPIO SIAFI"))
