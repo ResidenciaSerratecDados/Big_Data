@@ -11,3 +11,5 @@ Colab com Exemplo de Pandas, Polars, Parquet e Lazy: https://colab.research.goog
 Biblioteca Matplotlib: https://matplotlib.org/
 
 Biblioteca Seaborn: https://seaborn.pydata.org/tutorial/introduction.html
+
+Colab Polars Parquet: https://colab.research.google.com/drive/1yVT3he7RVwwCcm5RgcJvG_udYrnpmDZM
