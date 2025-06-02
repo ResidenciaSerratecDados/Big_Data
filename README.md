@@ -13,3 +13,5 @@ Biblioteca Matplotlib: https://matplotlib.org/
 Biblioteca Seaborn: https://seaborn.pydata.org/tutorial/introduction.html
 
 Colab Polars Parquet: https://colab.research.google.com/drive/1yVT3he7RVwwCcm5RgcJvG_udYrnpmDZM
+
+Estatística com Parquet: https://dontpad.com/analise_senac/aula5
