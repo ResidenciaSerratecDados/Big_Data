@@ -28,7 +28,7 @@ resultado_es=(df_010225.filter(pd.col("UF")=="ES")) # Filtro em df_010225
 display(resultado_es)
 
 display(resultado_es.select("CÓDIGO MUNICÍPIO SIAFI"))
-display(resultado_es.filter(pd.col("MÊS COMPETÊNCIA")==202502))
+display(resultado_es.filter(pd.col("MÊS COMPETÊNCIA")==202501))
 display(resultado_es.select(pd.col("UF")).describe())
 display(resultado_es.sort("NOME MUNICÍPIO"))
 display(resultado_es.group_by('UF').agg(pd.col('NOME MUNICÍPIO').value_counts()))
