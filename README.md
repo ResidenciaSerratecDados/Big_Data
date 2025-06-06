@@ -16,5 +16,6 @@ Colab Polars Parquet: https://colab.research.google.com/drive/1yVT3he7RVwwCcm5Rg
 
 Estatística com Parquet: https://dontpad.com/analise_senac/aula5
 
-
 Arquivo Parquet para Estatistica: https://drive.google.com/file/d/1IILYMhcyghgNfn-JIg57bomLMQc_m3y3/view?usp=sharing
+
+Análise de 3 Estados: https://colab.research.google.com/drive/11kRUCGhy2ppjKFR0ri-6EZwMWWG3qhPp
