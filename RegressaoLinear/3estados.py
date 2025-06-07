@@ -26,6 +26,8 @@ import numpy as np
 from sklearn.metrics import r2_score, mean_squared_error
 import pandas as pd
 
+# 1 - SELEÇÃO E PREPARAÇÃO DE DADOS
+
 # Define the file path
 file_path = '/content/202501_NovoBolsaFamilia_polars.parquet'
 
@@ -56,9 +58,24 @@ df_filtered = df.filter(
 # You might want to display or further process the filtered data
 display(df_filtered.head(700000))
 
+acre = df_filtered.filter(
+    pl.col('UF').is_in(['AC'])
+)
+sergipe = df_filtered.filter(
+    pl.col('UF').is_in(['SE'])
+)
+mato_grosso_sul = df_filtered.filter(
+    pl.col('UF').is_in(['MS'])
+)
+
+# 2 - ANALISE DESCRITIVA
+
 # Certifique-se que os dados estão corretamente agrupados
 df_agrupado = df_filtered.group_by("DATA_REF").agg(
-    pl.col("VALOR").mean().alias("VALOR_MEDIO").round(2)
+    pl.col("VALOR").min().alias("VALOR_MINIMO").round(2),
+    pl.col("VALOR").mean().alias("VALOR_MEDIO").round(2),
+    pl.col("VALOR").max().alias("VALOR_MAXIMO").round(2),
+    pl.col("NIS FAVORECIDO").count().alias("BENEFICIARIO").round(2)
 ).sort("DATA_REF")
 
 # Converter para Pandas explicitamente
@@ -74,25 +91,314 @@ sns.set_theme(style="whitegrid")
 # Criar a figura e o eixo explicitamente
 fig, ax = plt.subplots(figsize=(12, 6))
 
-# Plotar usando seaborn
+# Plotar usando seaborn, chamando lineplot for each desired column
 sns.lineplot(
     data=df_plot,
     x="DATA_REF",
-    y="VALOR_MEDIO",
+    y="VALOR_MINIMO", # Change 'VALORES' to 'VALOR_MINIMO'
     ax=ax,  # Especificar o eixo
     marker='o',  # Adicionar marcadores
-    linewidth=2.5  # Tornar a linha mais visível
+    linewidth=2.5,  # Tornar a linha mais visível
+    label='Valor Mínimo' # Add a label for the legend
+)
+
+sns.lineplot(
+    data=df_plot,
+    x="DATA_REF",
+    y="VALOR_MEDIO", # Change 'VALORES' to 'VALOR_MEDIO'
+    ax=ax,  # Especificar o eixo
+    marker='o',  # Adicionar marcadores
+    linewidth=2.5,  # Tornar a linha mais visível
+    label='Valor Médio' # Add a label for the legend
+)
+
+sns.lineplot(
+    data=df_plot,
+    x="DATA_REF",
+    y="VALOR_MAXIMO", # Change 'VALORES' to 'VALOR_MAXIMO'
+    ax=ax,  # Especificar o eixo
+    marker='o',  # Adicionar marcadores
+    linewidth=2.5,  # Tornar a linha mais visível
+    label='Valor Máximo' # Add a label for the legend
 )
 
 # Configurações adicionais
-ax.set_title("Valor Médio do Bolsa Família ao Longo do Tempo", pad=20)
+ax.set_title("Valores Mínimo, Médio e Máximo do Bolsa Família ao Longo do Tempo", pad=20)
 ax.set_xlabel("Mês de Referência", labelpad=10)
-ax.set_ylabel("Valor Médio (R$)", labelpad=10)
+ax.set_ylabel("Valores (R$)", labelpad=10)
+ax.tick_params(axis='x', rotation=45)  # Rotacionar labels do eixo x
+
+# Adicionar legenda
+ax.legend()
+
+# Ajustar layout para evitar cortes
+plt.tight_layout()
+plt.show()
+
+sns.barplot(
+    data=df_plot,
+    x="DATA_REF",
+    y="BENEFICIARIO", # Change 'VALORES' to 'Beneficiário'
+    ax=ax,  # Especificar o eixo
+)
+
+# Configurações adicionais
+ax.set_title("Quantidade de Beneficiários do Bolsa Família ao Longo do Tempo", pad=20)
+ax.set_xlabel("Mês de Referência", labelpad=10)
+ax.set_ylabel("Beneficiários", labelpad=10)
 ax.tick_params(axis='x', rotation=45)  # Rotacionar labels do eixo x
 
 # Ajustar layout para evitar cortes
 plt.tight_layout()
 plt.show()
+
+# Certifique-se que os dados estão corretamente agrupados
+df_agrupado_AC = acre.group_by("DATA_REF").agg(
+    pl.col("VALOR").min().alias("VALOR_MINIMO").round(2),
+    pl.col("VALOR").mean().alias("VALOR_MEDIO").round(2),
+    pl.col("VALOR").max().alias("VALOR_MAXIMO").round(2),
+    pl.col("NIS FAVORECIDO").count().alias("BENEFICIARIO").round(2)
+).sort("DATA_REF")
+
+# Converter para Pandas explicitamente
+df_plot_AC = df_agrupado_AC.to_pandas()
+
+# Verificar os dados que serão plotados
+print("Dados para plotagem:")
+print(df_plot_AC.head())
+
+# Configurar o estilo do seaborn
+sns.set_theme(style="whitegrid")
+
+# Criar a figura e o eixo explicitamente
+fig, ax = plt.subplots(figsize=(12, 6))
+
+# Plotar usando seaborn, chamando lineplot for each desired column
+sns.lineplot(
+    data=df_plot,
+    x="DATA_REF",
+    y="VALOR_MINIMO", # Change 'VALORES' to 'VALOR_MINIMO'
+    ax=ax,  # Especificar o eixo
+    marker='o',  # Adicionar marcadores
+    linewidth=2.5,  # Tornar a linha mais visível
+    label='Valor Mínimo' # Add a label for the legend
+)
+
+sns.lineplot(
+    data=df_plot,
+    x="DATA_REF",
+    y="VALOR_MEDIO", # Change 'VALORES' to 'VALOR_MEDIO'
+    ax=ax,  # Especificar o eixo
+    marker='o',  # Adicionar marcadores
+    linewidth=2.5,  # Tornar a linha mais visível
+    label='Valor Médio' # Add a label for the legend
+)
+
+sns.lineplot(
+    data=df_plot,
+    x="DATA_REF",
+    y="VALOR_MAXIMO", # Change 'VALORES' to 'VALOR_MAXIMO'
+    ax=ax,  # Especificar o eixo
+    marker='o',  # Adicionar marcadores
+    linewidth=2.5,  # Tornar a linha mais visível
+    label='Valor Máximo' # Add a label for the legend
+)
+
+# Configurações adicionais
+ax.set_title("Valores Mínimo, Médio e Máximo do Bolsa Família ao Longo do Tempo - Acre", pad=20)
+ax.set_xlabel("Mês de Referência", labelpad=10)
+ax.set_ylabel("Valores (R$)", labelpad=10)
+ax.tick_params(axis='x', rotation=45)  # Rotacionar labels do eixo x
+
+# Adicionar legenda
+ax.legend()
+
+# Ajustar layout para evitar cortes
+plt.tight_layout()
+plt.show()
+
+sns.barplot(
+    data=df_plot,
+    x="DATA_REF",
+    y="BENEFICIARIO", # Change 'VALORES' to 'Beneficiário'
+    ax=ax,  # Especificar o eixo
+)
+
+# Configurações adicionais
+ax.set_title("Quantidade de Beneficiários do Bolsa Família ao Longo do Tempo - Acre", pad=20)
+ax.set_xlabel("Mês de Referência", labelpad=10)
+ax.set_ylabel("Beneficiários", labelpad=10)
+ax.tick_params(axis='x', rotation=45)  # Rotacionar labels do eixo x
+
+# Ajustar layout para evitar cortes
+plt.tight_layout()
+plt.show()
+
+# Certifique-se que os dados estão corretamente agrupados
+df_agrupado_SE = sergipe.group_by("DATA_REF").agg(
+    pl.col("VALOR").min().alias("VALOR_MINIMO").round(2),
+    pl.col("VALOR").mean().alias("VALOR_MEDIO").round(2),
+    pl.col("VALOR").max().alias("VALOR_MAXIMO").round(2),
+    pl.col("NIS FAVORECIDO").count().alias("BENEFICIARIO").round(2)
+).sort("DATA_REF")
+
+# Converter para Pandas explicitamente
+df_plot_SE = df_agrupado_SE.to_pandas()
+
+# Verificar os dados que serão plotados
+print("Dados para plotagem:")
+print(df_plot_SE.head())
+
+# Configurar o estilo do seaborn
+sns.set_theme(style="whitegrid")
+
+# Criar a figura e o eixo explicitamente
+fig, ax = plt.subplots(figsize=(12, 6))
+
+# Plotar usando seaborn, chamando lineplot for each desired column
+sns.lineplot(
+    data=df_plot,
+    x="DATA_REF",
+    y="VALOR_MINIMO", # Change 'VALORES' to 'VALOR_MINIMO'
+    ax=ax,  # Especificar o eixo
+    marker='o',  # Adicionar marcadores
+    linewidth=2.5,  # Tornar a linha mais visível
+    label='Valor Mínimo' # Add a label for the legend
+)
+
+sns.lineplot(
+    data=df_plot,
+    x="DATA_REF",
+    y="VALOR_MEDIO", # Change 'VALORES' to 'VALOR_MEDIO'
+    ax=ax,  # Especificar o eixo
+    marker='o',  # Adicionar marcadores
+    linewidth=2.5,  # Tornar a linha mais visível
+    label='Valor Médio' # Add a label for the legend
+)
+
+sns.lineplot(
+    data=df_plot,
+    x="DATA_REF",
+    y="VALOR_MAXIMO", # Change 'VALORES' to 'VALOR_MAXIMO'
+    ax=ax,  # Especificar o eixo
+    marker='o',  # Adicionar marcadores
+    linewidth=2.5,  # Tornar a linha mais visível
+    label='Valor Máximo' # Add a label for the legend
+)
+
+# Configurações adicionais
+ax.set_title("Valores Mínimo, Médio e Máximo do Bolsa Família ao Longo do Tempo - Sergipe", pad=20)
+ax.set_xlabel("Mês de Referência", labelpad=10)
+ax.set_ylabel("Valores (R$)", labelpad=10)
+ax.tick_params(axis='x', rotation=45)  # Rotacionar labels do eixo x
+
+# Adicionar legenda
+ax.legend()
+
+# Ajustar layout para evitar cortes
+plt.tight_layout()
+plt.show()
+
+sns.barplot(
+    data=df_plot,
+    x="DATA_REF",
+    y="BENEFICIARIO", # Change 'VALORES' to 'Beneficiário'
+    ax=ax,  # Especificar o eixo
+)
+
+# Configurações adicionais
+ax.set_title("Quantidade de Beneficiários do Bolsa Família ao Longo do Tempo - Sergipe", pad=20)
+ax.set_xlabel("Mês de Referência", labelpad=10)
+ax.set_ylabel("Beneficiários", labelpad=10)
+ax.tick_params(axis='x', rotation=45)  # Rotacionar labels do eixo x
+
+# Ajustar layout para evitar cortes
+plt.tight_layout()
+plt.show()
+
+# Certifique-se que os dados estão corretamente agrupados
+df_agrupado_MS = mato_grosso_sul.group_by("DATA_REF").agg(
+    pl.col("VALOR").min().alias("VALOR_MINIMO").round(2),
+    pl.col("VALOR").mean().alias("VALOR_MEDIO").round(2),
+    pl.col("VALOR").max().alias("VALOR_MAXIMO").round(2),
+    pl.col("NIS FAVORECIDO").count().alias("BENEFICIARIO").round(2)
+).sort("DATA_REF")
+
+# Converter para Pandas explicitamente
+df_plot_MS = df_agrupado_MS.to_pandas()
+
+# Verificar os dados que serão plotados
+print("Dados para plotagem:")
+print(df_plot_MS.head())
+
+# Configurar o estilo do seaborn
+sns.set_theme(style="whitegrid")
+
+# Criar a figura e o eixo explicitamente
+fig, ax = plt.subplots(figsize=(12, 6))
+
+# Plotar usando seaborn, chamando lineplot for each desired column
+sns.lineplot(
+    data=df_plot,
+    x="DATA_REF",
+    y="VALOR_MINIMO", # Change 'VALORES' to 'VALOR_MINIMO'
+    ax=ax,  # Especificar o eixo
+    marker='o',  # Adicionar marcadores
+    linewidth=2.5,  # Tornar a linha mais visível
+    label='Valor Mínimo' # Add a label for the legend
+)
+
+sns.lineplot(
+    data=df_plot,
+    x="DATA_REF",
+    y="VALOR_MEDIO", # Change 'VALORES' to 'VALOR_MEDIO'
+    ax=ax,  # Especificar o eixo
+    marker='o',  # Adicionar marcadores
+    linewidth=2.5,  # Tornar a linha mais visível
+    label='Valor Médio' # Add a label for the legend
+)
+
+sns.lineplot(
+    data=df_plot,
+    x="DATA_REF",
+    y="VALOR_MAXIMO", # Change 'VALORES' to 'VALOR_MAXIMO'
+    ax=ax,  # Especificar o eixo
+    marker='o',  # Adicionar marcadores
+    linewidth=2.5,  # Tornar a linha mais visível
+    label='Valor Máximo' # Add a label for the legend
+)
+
+# Configurações adicionais
+ax.set_title("Valores Mínimo, Médio e Máximo do Bolsa Família ao Longo do Tempo - Mato Grosso do Sul", pad=20)
+ax.set_xlabel("Mês de Referência", labelpad=10)
+ax.set_ylabel("Valores (R$)", labelpad=10)
+ax.tick_params(axis='x', rotation=45)  # Rotacionar labels do eixo x
+
+# Adicionar legenda
+ax.legend()
+
+# Ajustar layout para evitar cortes
+plt.tight_layout()
+plt.show()
+
+sns.barplot(
+    data=df_plot,
+    x="DATA_REF",
+    y="BENEFICIARIO", # Change 'VALORES' to 'Beneficiário'
+    ax=ax,  # Especificar o eixo
+)
+
+# Configurações adicionais
+ax.set_title("Quantidade de Beneficiários do Bolsa Família ao Longo do Tempo - Mato Grosso do Sul", pad=20)
+ax.set_xlabel("Mês de Referência", labelpad=10)
+ax.set_ylabel("Beneficiários", labelpad=10)
+ax.tick_params(axis='x', rotation=45)  # Rotacionar labels do eixo x
+
+# Ajustar layout para evitar cortes
+plt.tight_layout()
+plt.show()
+
+# 3 - MODELAGEM PREDITIVA
 
 # 1. Converter para tipo Date do Polars se necessário
 if df_agrupado["DATA_REF"].dtype != pl.Date:
@@ -159,69 +465,9 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 
-# Versão Alternativa com intervalo de confiança:
-
-plt.figure(figsize=(10, 6))
-sns.regplot(x=X.flatten(), y=y, ci=95,
-            line_kws={'color': 'red', 'label': f'y = {inclinacao:.2f}x + {intercepto:.2f}'})
-plt.title('Regressão Linear com Intervalo de Confiança 95%')
-plt.xlabel('Meses desde o início')
-plt.ylabel('Valor Médio (R$)')
-plt.legend()
-plt.grid(True)
-plt.show()
-
 #Gráfico individual para cada estado
 
-acre = df_filtered.filter(
-    pl.col('UF').is_in(['AC'])
-)
-sergipe = df_filtered.filter(
-    pl.col('UF').is_in(['SE'])
-)
-mato_grosso_sul = df_filtered.filter(
-    pl.col('UF').is_in(['MS'])
-)
-
 #ACRE
-
-# Certifique-se que os dados estão corretamente agrupados
-df_agrupado_AC = acre.group_by("DATA_REF").agg(
-    pl.col("VALOR").mean().alias("VALOR_MEDIO").round(2)
-).sort("DATA_REF")
-
-# Converter para Pandas explicitamente
-df_plot_AC = df_agrupado_AC.to_pandas()
-
-# Verificar os dados que serão plotados
-print("Dados para plotagem:")
-print(df_plot_AC.head())
-
-# Configurar o estilo do seaborn
-sns.set_theme(style="whitegrid")
-
-# Criar a figura e o eixo explicitamente
-fig, ax = plt.subplots(figsize=(12, 6))
-
-# Plotar usando seaborn
-sns.lineplot(
-    data=df_plot_AC,
-    x="DATA_REF",
-    y="VALOR_MEDIO",
-    ax=ax,  # Especificar o eixo
-    marker='o',  # Adicionar marcadores
-    linewidth=2.5  # Tornar a linha mais visível
-)
-
-# Configurações adicionais
-ax.set_title("Valor Médio do Bolsa Família - Acre", pad=20)
-ax.set_xlabel("Mês de Referência", labelpad=10)
-ax.set_ylabel("Valor Médio (R$)", labelpad=10)
-ax.tick_params(axis='x', rotation=45)  # Rotacionar labels do eixo x
-
-# Ajustar layout para evitar cortes
-plt.tight_layout()
-plt.show()
 
 # 1. Converter para tipo Date do Polars se necessário
 if df_agrupado_AC["DATA_REF"].dtype != pl.Date:
@@ -288,57 +534,7 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 
-# Versão Alternativa com intervalo de confiança:
-
-plt.figure(figsize=(10, 6))
-sns.regplot(x=X.flatten(), y=y, ci=95,
-            line_kws={'color': 'red', 'label': f'y = {inclinacao_AC:.2f}x + {intercepto_AC:.2f}'})
-plt.title('Regressão Linear com Intervalo de Confiança 95% - Acre')
-plt.xlabel('Meses desde o início')
-plt.ylabel('Valor Médio (R$)')
-plt.legend()
-plt.grid(True)
-plt.show()
-
 #SERGIPE
-
-# Certifique-se que os dados estão corretamente agrupados
-df_agrupado_SE = sergipe.group_by("DATA_REF").agg(
-    pl.col("VALOR").mean().alias("VALOR_MEDIO").round(2)
-).sort("DATA_REF")
-
-# Converter para Pandas explicitamente
-df_plot_SE = df_agrupado_SE.to_pandas()
-
-# Verificar os dados que serão plotados
-print("Dados para plotagem:")
-print(df_plot_SE.head())
-
-# Configurar o estilo do seaborn
-sns.set_theme(style="whitegrid")
-
-# Criar a figura e o eixo explicitamente
-fig, ax = plt.subplots(figsize=(12, 6))
-
-# Plotar usando seaborn
-sns.lineplot(
-    data=df_plot_SE,
-    x="DATA_REF",
-    y="VALOR_MEDIO",
-    ax=ax,  # Especificar o eixo
-    marker='o',  # Adicionar marcadores
-    linewidth=2.5  # Tornar a linha mais visível
-)
-
-# Configurações adicionais
-ax.set_title("Valor Médio do Bolsa Família - Sergipe", pad=20)
-ax.set_xlabel("Mês de Referência", labelpad=10)
-ax.set_ylabel("Valor Médio (R$)", labelpad=10)
-ax.tick_params(axis='x', rotation=45)  # Rotacionar labels do eixo x
-
-# Ajustar layout para evitar cortes
-plt.tight_layout()
-plt.show()
 
 # 1. Converter para tipo Date do Polars se necessário
 if df_agrupado_SE["DATA_REF"].dtype != pl.Date:
@@ -397,7 +593,7 @@ plt.plot(X, y_pred_SE, color='red', linewidth=2, label=f'Regressão: y = {inclin
 # Configurações do gráfico
 plt.title('Regressão Linear: Valor Médio vs Tempo (Meses) - Sergipe')
 plt.xlabel('Meses desde o início')
-plt.ylabel('Valor Médio (R$)')
+plt.ylabel('Valores (R$)')
 plt.grid(True)
 plt.legend()
 
@@ -405,57 +601,7 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 
-# Versão Alternativa com intervalo de confiança:
-
-plt.figure(figsize=(10, 6))
-sns.regplot(x=X.flatten(), y=y, ci=95,
-            line_kws={'color': 'red', 'label': f'y = {inclinacao_SE:.2f}x + {intercepto_SE:.2f}'})
-plt.title('Regressão Linear com Intervalo de Confiança 95% - Sergipe')
-plt.xlabel('Meses desde o início')
-plt.ylabel('Valor Médio (R$)')
-plt.legend()
-plt.grid(True)
-plt.show()
-
 #MATO GROSSO DO SUL
-
-# Certifique-se que os dados estão corretamente agrupados
-df_agrupado_MS = mato_grosso_sul.group_by("DATA_REF").agg(
-    pl.col("VALOR").mean().alias("VALOR_MEDIO").round(2)
-).sort("DATA_REF")
-
-# Converter para Pandas explicitamente
-df_plot_MS = df_agrupado_MS.to_pandas()
-
-# Verificar os dados que serão plotados
-print("Dados para plotagem:")
-print(df_plot_MS.head())
-
-# Configurar o estilo do seaborn
-sns.set_theme(style="whitegrid")
-
-# Criar a figura e o eixo explicitamente
-fig, ax = plt.subplots(figsize=(12, 6))
-
-# Plotar usando seaborn
-sns.lineplot(
-    data=df_plot_MS,
-    x="DATA_REF",
-    y="VALOR_MEDIO",
-    ax=ax,  # Especificar o eixo
-    marker='o',  # Adicionar marcadores
-    linewidth=2.5  # Tornar a linha mais visível
-)
-
-# Configurações adicionais
-ax.set_title("Valor Médio do Bolsa Família - Mato Grosso do Sul", pad=20)
-ax.set_xlabel("Mês de Referência", labelpad=10)
-ax.set_ylabel("Valor Médio (R$)", labelpad=10)
-ax.tick_params(axis='x', rotation=45)  # Rotacionar labels do eixo x
-
-# Ajustar layout para evitar cortes
-plt.tight_layout()
-plt.show()
 
 # 1. Converter para tipo Date do Polars se necessário
 if df_agrupado_MS["DATA_REF"].dtype != pl.Date:
@@ -522,6 +668,44 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 
+# Intervalo de Confiança 95% por Estado
+
+# Versão Alternativa com intervalo de confiança:
+
+plt.figure(figsize=(10, 6))
+sns.regplot(x=X.flatten(), y=y, ci=95,
+            line_kws={'color': 'red', 'label': f'y = {inclinacao:.2f}x + {intercepto:.2f}'})
+plt.title('Regressão Linear com Intervalo de Confiança 95%')
+plt.xlabel('Meses desde o início')
+plt.ylabel('Valor Médio (R$)')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Versão Alternativa com intervalo de confiança:
+
+plt.figure(figsize=(10, 6))
+sns.regplot(x=X.flatten(), y=y, ci=95,
+            line_kws={'color': 'red', 'label': f'y = {inclinacao_AC:.2f}x + {intercepto_AC:.2f}'})
+plt.title('Regressão Linear com Intervalo de Confiança 95% - Acre')
+plt.xlabel('Meses desde o início')
+plt.ylabel('Valor Médio (R$)')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Versão Alternativa com intervalo de confiança:
+
+plt.figure(figsize=(10, 6))
+sns.regplot(x=X.flatten(), y=y, ci=95,
+            line_kws={'color': 'red', 'label': f'y = {inclinacao_SE:.2f}x + {intercepto_SE:.2f}'})
+plt.title('Regressão Linear com Intervalo de Confiança 95% - Sergipe')
+plt.xlabel('Meses desde o início')
+plt.ylabel('Valor Médio (R$)')
+plt.legend()
+plt.grid(True)
+plt.show()
+
 # Versão Alternativa com intervalo de confiança:
 
 plt.figure(figsize=(10, 6))
@@ -533,3 +717,32 @@ plt.ylabel('Valor Médio (R$)')
 plt.legend()
 plt.grid(True)
 plt.show()
+
+# 4 - ANÁLISE COMPARATIVA
+
+'''Durante o período de 8 meses ocorreu:
+
+- Aumento da quantidade de beneficiários nos 3 estados;
+
+- No estado do Acre o valor inicial do benefício mínimo foi de 350.00, o médio de 707.40 e o máximo de 1336.00;
+- No estado do Acre o valor final do benefício mínimo foi de 300.00, o médio de 724.24 e o máximo de 2104.00;
+
+- No estado de Sergipe o valor inicial do benefício mínimo foi de 700.00, o médio de 700.00 e o máximo de 700.00;
+- No estado de Sergipe o valor final do benefício mínimo foi de 300.00, o médio de 627.89 e o máximo de 1728.00;
+
+- No estado do Mato Grosso do Sul o valor inicial do benefício mínimo foi de 300.00, o médio de 300.00 e o máximo de 300.00;
+- No estado do Mato Grosso do Sul o valor final do benefício mínimo foi de 300.00, o médio de 673.75 e o máximo de 1436.00;
+
+- O valor inicial do benefício mínimo mais alto foi no estado de Sergipe;
+- O valor inicial da média do benefício mais alto foi no estado do Acre;
+- O valor inicial do benefício máximo mais alto foi no estado do Acre;
+
+- O estado que teve maior o maior crescimento mensal em relação ao valor médio do benefício foi o Mato Grosso do Sul,
+pois salto de 300.00 para 673.15 em 8 meses com um crescimento de 124.59% neste período;
+
+- O Intervalo de Confiança demonstra a linha de tendência da função, pontuando os valores máximos e mínimos de cada período;
+- O Intervalo de Confiança de 95 %  deixa a linha sempre próxima a média em cada período, pontuando também os valores máximos e mínimos,
+e sombreia a faixa da margem de erro em um intervalo próximo à média;
+- O Intervalo de Confiança é mais preciso para esta anállise, pois utiliza linha de tendência, máximos e mínimos.
+
+'''
