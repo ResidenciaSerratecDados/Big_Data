@@ -20,4 +20,3 @@ Arquivo Parquet para Estatistica: https://drive.google.com/file/d/1IILYMhcyghgNf
 
 Análise de 3 Estados: https://colab.research.google.com/drive/11kRUCGhy2ppjKFR0ri-6EZwMWWG3qhPp
 
-Endpoint OData: https://olinda.bcb.gov.br/olinda/servico/CADIP_DADOS_PUBLICOS/versao/v1/odata/
